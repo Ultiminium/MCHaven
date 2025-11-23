@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="content-box" style="max-width: 600px; margin: 0 auto;">
+            <h2>Submit Content</h2>
+            
+            <% if (!locals.userId) { %>
+                <p>You must be logged in to submit content.</p>
+                <a href="/login.html" class="button">Log In</a>
+            <% } else { %>
+                <form action="/submit" method="POST" enctype="multipart/form-data">
+                    
+                    <div class="form-group">
+                        <label>Game Edition</label>
+                        <div class="radio-group" style="display:flex; gap:1.5rem; margin-top:0.5rem;">
+                            <label style="font-weight: normal; cursor: pointer;">
+                                <input type="radio" name="edition" value="bedrock" checked> 
+                                <strong>Bedrock Edition</strong> (.mcpack, .mcaddon, etc.)
+                            </label>
+                            <label style="font-weight: normal; cursor: pointer;">
+                                <input type="radio" name="edition" value="java"> 
+                                <strong>Java Edition</strong> (.zip, .jar)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Content Category</label>
+                        <select name="category" required>
+                            <option value="texture-pack">Texture Pack</option>
+                            <option value="addon">Addon</option>
+                            <option value="skin-pack">Skin Pack</option>
+                            <option value="world">World</option>
+                            
+                            <% if (locals.userRole === 'admin' || locals.userRole === 'mod') { %>
+                                <option value="useful">Useful (Mods/Admins Only)</option>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" name="title" required placeholder="e.g. Ultra Realism Pack">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="5" required placeholder="Describe your content..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tags (Optional)</label>
+                        <input type="text" name="tags" placeholder="e.g., 16x16, PvP, FPS Boost, Medieval">
+                        <small style="color:var(--text-secondary);">Separate tags with commas. This helps people find your pack!</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Supported Versions</label>
+                        <input type="text" name="supported_versions" placeholder="e.g., 1.20, 1.21">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Credits / Original Author Link</label>
+                        <input type="url" name="credit" required placeholder="Link to original creator or source">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thumbnail Image (Required)</label>
+                        <input type="file" name="thumbnailFile" accept="image/*" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Download File (Upload OR Use Link below)</label>
+                        <input type="file" name="downloadFile">
+                    </div>
+                    <div class="form-group">
+                        <label>OR Download Link (Mediafire, etc.)</label>
+                        <input type="url" name="downloadLink" placeholder="https://...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Extra Images (Optional)</label>
+                        <input type="file" name="imageFile1" accept="image/*">
+                        <input type="file" name="imageFile2" accept="image/*">
+                        <input type="file" name="imageFile3" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="button">Submit for Review</button>
+                </form>
+            <% } %>
+        </div>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

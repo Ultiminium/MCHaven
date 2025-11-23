@@ -1,0 +1,17 @@
+<a href="/profile/<%= user.username %>" class="user-result-card">
+    <img src="<%= user.pfp_url %>" alt="<%= user.username %>" class="user-result-img">
+    
+    <h3 class="user-result-username">
+        <%= user.username %>
+        <% if (user.role === 'mod') { %> ⚔️ <% } %>
+        <% if (user.role === 'admin') { %> 🛡️ <% } %>
+    </h3>
+    
+    <% if (user.role !== 'user') { %>
+        <div class="user-result-role"><%= user.role %></div>
+    <% } %>
+
+    <% if (user.bio) { %>
+        <div class="user-result-bio"><%= user.bio %></div>
+    <% } %>
+</a>

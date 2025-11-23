@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="content-box">
+            <h2>Admin Dashboard</h2>
+            <p>Welcome. Manage content below.</p>
+        </div>
+
+        <h3 style="margin-top: 2rem;">Pending Submissions (<%= submissions.length %>)</h3>
+        <div class="item-container">
+            <% if (submissions.length > 0) { %>
+                <% submissions.forEach(sub => { %>
+                    <div class="item-card" style="display:flex; flex-direction:column; justify-content:space-between; background: var(--bg-secondary);">
+                        <img src="<%= sub.thumbnail_url %>" style="height:150px; width:100%; object-fit:cover;">
+                        <div class="info" style="padding: 1rem;">
+                            <h4 style="margin:0;"><%= sub.title %></h4>
+                            <p style="font-size:0.8rem; margin:0.5rem 0;">User #<%= sub.user_id %></p>
+                            <a href="/submission/<%= sub.id %>" target="_blank">View &raquo;</a>
+                            <div style="margin-top:1rem; display:flex; gap:0.5rem;">
+                                <form action="/admin/approve/<%= sub.id %>" method="POST" style="flex:1;">
+                                    <button type="submit" class="button" style="background:#4CAF50; width:100%;">Approve</button>
+                                </form>
+                                <button class="button" onclick="openRejectModal('<%= sub.id %>')" style="background:#ff4444; flex:1;">Reject</button>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %> <p>No pending items.</p> <% } %>
+        </div>
+
+        <% if (reportedComments.length > 0) { %>
+            <h3>Reported Comments</h3>
+            <% reportedComments.forEach(c => { %>
+                <div class="content-box" style="display:flex; justify-content:space-between;">
+                    <p>"<%= c.comment_text %>" - <strong><%= c.author %></strong></p>
+                    <form action="/admin/comment/delete/<%= c.id %>" method="POST"><button class="button" style="background:#ff4444;">Delete</button></form>
+                </div>
+            <% }); %>
+        <% } %>
+    </main>
+
+    <dialog id="rejectDialog" style="border:1px solid #555; background:var(--bg-secondary); color:white; border-radius:8px; padding:20px; width:90%; max-width:400px;">
+        <h3 style="margin-top:0;">Reject Submission</h3>
+        <form id="rejectForm" method="POST">
+            <div class="form-group">
+                <label>Reason</label>
+                <select name="reason" required style="width:100%; padding:8px;">
+                    <option value="Quality">Low Quality</option>
+                    <option value="Inappropriate">Inappropriate</option>
+                    <option value="Stolen">Stolen Content</option>
+                    <option value="Category">Wrong Category</option>
+                    <option value="Broken">Broken Link</option>
+                </select>
+            </div>
+            <div class="form-group" style="margin-top:1rem;">
+                <label>Advice</label>
+                <textarea name="advice" rows="3" required style="width:100%; padding:8px;"></textarea>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:15px;">
+                <button type="button" onclick="document.getElementById('rejectDialog').close()" style="cursor:pointer;">Cancel</button>
+                <button type="submit" class="button" style="background:#ff4444;">Confirm</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        function openRejectModal(id) {
+            document.getElementById('rejectForm').action = `/admin/reject/${id}`;
+            document.getElementById('rejectDialog').showModal();
+        }
+    </script>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

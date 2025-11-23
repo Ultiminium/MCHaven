@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main data-layout="grid">
+        <h2>Useful Stuff</h2>
+        <p>Official tools, utilities, and resources.</p>
+        
+        <div class="item-container">
+            <% if (submissions.length > 0) { %>
+                <% submissions.forEach(submission => { %>
+                    <%- include('partials/item-card', { submission: submission }) %>
+                <% }); %>
+            <% } else { %>
+                <p>No useful items found yet.</p>
+            <% } %>
+        </div>
+
+        <%- include('partials/pagination'); %>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

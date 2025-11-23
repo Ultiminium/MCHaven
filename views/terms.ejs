@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="content-box" style="max-width: 600px; margin: 2rem auto;">
+            <h2>Terms of Service</h2>
+            <p>Welcome to MCHaven! Before you continue, please review and accept our rules.</p>
+            
+            <div style="background:var(--bg-primary); padding:1rem; border-radius:5px; height:200px; overflow-y:scroll; border:1px solid var(--border-color); margin:1rem 0;">
+                <p>1. Be respectful to other users.</p>
+                <p>2. Do not upload stolen or copyrighted content.</p>
+                <p>3. No NSFW or inappropriate content.</p>
+                <p>4. Admins reserve the right to remove content at any time.</p>
+                <p>5. By accepting, you agree to use MCHaven responsibly.</p>
+                </div>
+
+            <form action="/accept-terms" method="POST">
+                <button type="submit" class="button" style="width:100%;">I Accept the Terms</button>
+            </form>
+        </div>
+    </main>
+    <%- include('partials/footer'); %>
+</body>
+</html>

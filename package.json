@@ -1,0 +1,19 @@
+{
+  "name": "mchaven-project",
+  "version": "1.0.0",
+  "description": "A Minecraft Bedrock content hub",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^7.0.10",
+    "sqlite3": "^5.1.7"
+  }
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="content-box" style="max-width: 400px; margin: 0 auto; text-align: center;">
+            <h2>Forgot Password</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Enter your email address below. We will send you a 6-digit code to reset your password.
+            </p>
+            
+            <% if (message) { %>
+                <div class="message" style="background-color: #333; border: 1px solid var(--accent-primary); padding: 10px; border-radius: 5px;">
+                    <%= message %>
+                </div>
+            <% } %>
+
+            <form action="/forgot-password" method="POST" style="margin-top: 1.5rem;">
+                <div class="form-group">
+                    <label style="text-align: left; display: block;">Email Address</label>
+                    <input type="email" name="email" placeholder="Enter your email..." required>
+                </div>
+                <button type="submit" class="button" style="width: 100%;">Send Reset Code</button>
+            </form>
+            
+            <p style="margin-top: 1.5rem;">
+                <a href="/login.html" style="color: var(--text-secondary);">Back to Login</a>
+            </p>
+        </div>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

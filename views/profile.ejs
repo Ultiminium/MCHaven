@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="profile-layout">
+            <div class="profile-submissions">
+                <div class="item-container">
+                    <% if (submissions.length > 0) { %>
+                        <% submissions.forEach(submission => { %>
+                            <%- include('partials/item-card', { submission: submission }) %>
+                        <% }); %>
+                    <% } else { %>
+                        <p><%= profileUser.username %> has not submitted any content yet.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <aside class="profile-info">
+                <div class="content-box" style="text-align: center;">
+                    <% if (followerCount >= 50000) { %>
+                        <div class="top-creator-tag">TOP CREATOR</div>
+                    <% } %>
+
+                    <img 
+                        src="<%= profileUser.pfp_url %>" 
+                        alt="Profile picture for <%= profileUser.username %>"
+                        style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border-color);"
+                    >
+                    
+                    <div class="profile-user-line">
+                        <h2 style="margin-top: 1rem;">
+                            <%= profileUser.username %>
+                            
+                            <% if (profileUser.role === 'mod') { %>
+                                <span title="Moderator" style="color: var(--accent-primary); font-size: 1.2rem; margin-left: 5px;">⚔️</span>
+                            <% } %>
+                            
+                            <% if (profileUser.role === 'admin') { %>
+                                <span title="Admin" style="color: var(--accent-primary); font-size: 1.2rem; margin-left: 5px;">🛡️</span>
+                            <% } %>
+                        </h2>
+                        
+                        <div class="comment-menu">
+                            <details>
+                                <summary>⋮</summary>
+                                <nav class="menu-dropdown">
+                                    <% if (locals.userId && locals.userId !== profileUser.id) { %>
+                                        <form action="/profile/<%= profileUser.username %>/report" method="POST">
+                                            <button type="submit">Report User</button>
+                                        </form>
+                                    <% } %>
+                                    
+                                    <% if (userRole === 'admin' && locals.userId !== profileUser.id) { %>
+                                        
+                                        <% if (profileUser.role === 'user') { %>
+                                            <form action="/profile/<%= profileUser.username %>/promote" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to promote this user to Moderator? They will have the power to delete comments and approve submissions.');">
+                                                <button type="submit" style="color: var(--accent-primary); font-weight: bold;">Promote to Moderator</button>
+                                            </form>
+                                        <% } %>
+                                        
+                                        <% if (profileUser.role === 'mod') { %>
+                                            <form action="/profile/<%= profileUser.username %>/demote" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to REMOVE Moderator status from this user?');">
+                                                <button type="submit" style="color: #ff8a80; font-weight: bold;">Demote Moderator</button>
+                                            </form>
+                                        <% } %>
+
+                                    <% } %>
+                                </nav>
+                            </details>
+                        </div>
+                    </div>
+                    
+                    <div class="follower-section">
+                        <p><%= followerCount %> Followers</p>
+                        <% if (locals.userId && locals.userId !== profileUser.id) { %>
+                            <% if (isFollowing) { %>
+                                <form action="/profile/<%= profileUser.username %>/unfollow" method="POST">
+                                    <button type="submit" class="button">Unfollow</button>
+                                </form>
+                            <% } else { %>
+                                <form action="/profile/<%= profileUser.username %>/follow" method="POST">
+                                    <button type="submit" class="button">Follow</button>
+                                </form>
+                            <% } %>
+                        <% } %>
+                    </div>
+
+                    <% if (profileUser.bio) { %>
+                        <div class="profile-bio">
+                            <p><%= profileUser.bio %></p>
+                        </div>
+                    <% } %>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

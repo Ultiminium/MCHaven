@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <section class="content-box" style="max-width: 500px; margin: auto;">
+            <form action="/register" method="POST" class="submission-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="pfpFile">Profile Picture (Optional)</label>
+                    <input type="file" id="pfpFile" name="pfpFile" accept="image/png, image/jpeg, image/webp">
+                </div>
+                <button type="submit" class="submit-button">Create Account</button>
+            </form>
+        </section>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

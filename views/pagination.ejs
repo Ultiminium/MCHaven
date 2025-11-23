@@ -1,0 +1,28 @@
+<% if (totalPages > 1) { %>
+    <nav class="pagination-nav">
+        <ul>
+            <%# Previous Page Link %>
+            <% if (currentPage > 1) { %>
+                <li><a href="<%= baseUrl %>?page=<%= currentPage - 1 %>">«</a></li>
+            <% } else { %>
+                <li class="disabled"><span>«</span></li>
+            <% } %>
+
+            <%# Page Number Links %>
+            <% for (let i = 1; i <= totalPages; i++) { %>
+                <% if (i === currentPage) { %>
+                    <li class="active"><span><%= i %></span></li>
+                <% } else { %>
+                    <li><a href="<%= baseUrl %>?page=<%= i %>"><%= i %></a></li>
+                <% } %>
+            <% } %>
+
+            <%# Next Page Link %>
+            <% if (currentPage < totalPages) { %>
+                <li><a href="<%= baseUrl %>?page=<%= currentPage + 1 %>">»</a></li>
+            <% } else { %>
+                <li class="disabled"><span>»</span></li>
+            <% } %>
+        </ul>
+    </nav>
+<% } %>

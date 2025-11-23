@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <% if (submission.status === 'rejected') { %>
+            <div class="content-box" style="border: 2px solid #ff4444; background: rgba(255, 68, 68, 0.05); margin-bottom: 2rem; text-align: left;">
+                <h2 style="color: #ff4444; margin-top: 0; display: flex; align-items: center; gap: 10px;">
+                    ⚠️ Submission Rejected
+                </h2>
+                
+                <div style="background: var(--bg-primary); padding: 15px; border-radius: 5px; border: 1px solid var(--border-color); margin: 1rem 0;">
+                    <p style="margin: 0 0 10px 0;">
+                        <strong style="color: var(--accent-primary);">Reason:</strong> 
+                        <%= submission.rejection_reason %>
+                    </p>
+                    <p style="margin: 0;">
+                        <strong style="color: var(--accent-primary);">Mod Advice:</strong> 
+                        <%= submission.rejection_advice %>
+                    </p>
+                </div>
+
+                <p style="font-size: 0.9rem; color: var(--text-secondary);">
+                    You cannot edit a rejected submission. You must delete it and upload a new version with the fixes.
+                </p>
+                
+                <form action="/submission/delete/<%= submission.id %>" method="POST" onsubmit="return confirm('Are you sure you want to delete this?');">
+                    <button type="submit" class="button" style="background: #ff4444;">Delete Submission</button>
+                </form>
+            </div>
+        <% } %>
+
+
+        <% if (submission.status === 'pending') { %>
+            <div class="content-box" style="border: 2px solid #ffbb33; background: rgba(255, 187, 51, 0.05); margin-bottom: 2rem;">
+                <h3 style="color: #ffbb33; margin-top: 0;">⏳ Pending Review</h3>
+                <p>This submission is currently waiting for approval from a moderator. It is not visible to the public yet.</p>
+            </div>
+        <% } %>
+
+
+        <div class="content-box">
+            <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+                <h1 style="margin-bottom: 0.5rem;"><%= submission.title %></h1>
+                
+                <div class="card-meta-info">
+                    <span class="category-tag"><%= submission.category %></span>
+                    <% if (submission.edition) { %>
+                        <span class="category-tag" style="background: <%= submission.edition === 'java' ? '#d32f2f' : '#388e3c' %>;">
+                            <%= submission.edition %>
+                        </span>
+                    <% } %>
+                    <% if (submission.supported_versions) { %>
+                        <span class="version-tag">v<%= submission.supported_versions %></span>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="gallery-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                <img src="<%= submission.thumbnail_url %>" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; border: 2px solid var(--border-color);">
+                
+                <% if (submission.image_url_1 || submission.image_url_2 || submission.image_url_3) { %>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                        <% if (submission.image_url_1) { %><img src="<%= submission.image_url_1 %>" style="width:100%; height:100px; object-fit:cover; border-radius:5px; cursor:pointer;" onclick="window.open(this.src)"><% } %>
+                        <% if (submission.image_url_2) { %><img src="<%= submission.image_url_2 %>" style="width:100%; height:100px; object-fit:cover; border-radius:5px; cursor:pointer;" onclick="window.open(this.src)"><% } %>
+                        <% if (submission.image_url_3) { %><img src="<%= submission.image_url_3 %>" style="width:100%; height:100px; object-fit:cover; border-radius:5px; cursor:pointer;" onclick="window.open(this.src)"><% } %>
+                    </div>
+                <% } %>
+            </div>
+
+            <div class="description-section" style="white-space: pre-wrap; margin-bottom: 2rem; line-height: 1.8;">
+                <%= submission.description %>
+            </div>
+
+            <% if (submission.tags) { %>
+                <div style="margin-bottom: 2rem; color: var(--text-secondary);">
+                    <strong>Tags:</strong> 
+                    <% submission.tags.split(',').forEach(tag => { %>
+                        <span style="background: var(--bg-primary); padding: 2px 8px; border-radius: 4px; margin-right: 5px; font-size: 0.9rem;">#<%= tag.trim() %></span>
+                    <% }); %>
+                </div>
+            <% } %>
+
+            <div class="actions-section" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                
+                <% if (submission.status === 'approved' || locals.userId === submission.user_id || userRole === 'admin') { %>
+                    <a href="/download-redirect?url=<%= encodeURIComponent(submission.download_url) %>" class="button" target="_blank">Download Now</a>
+                <% } else { %>
+                    <button class="button" disabled style="background: #555; cursor: not-allowed;">Download Locked</button>
+                <% } %>
+
+                <a href="<%= submission.credit_url %>" target="_blank" style="color: var(--accent-primary); text-decoration: none;">Credits / Original Source</a>
+
+                <% if (locals.userId === submission.user_id || userRole === 'admin' || userRole === 'mod') { %>
+                    <form action="/submission/delete/<%= submission.id %>" method="POST" onsubmit="return confirm('Delete this submission?');" style="margin-left: auto;">
+                        <button type="submit" class="button" style="background: #ff4444;">Delete</button>
+                    </form>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="comments-container content-box" style="margin-top: 2rem;">
+            <h3>Comments (<%= comments.length %>)</h3>
+            
+            <% if (locals.userId) { %>
+                <form action="/submission/<%= submission.id %>/comment" method="POST" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
+                    <input type="text" name="comment_text" placeholder="Write a comment..." required style="flex: 1;">
+                    <button type="submit" class="button">Post</button>
+                </form>
+            <% } else { %>
+                <p><a href="/login.html" style="color: var(--accent-primary);">Log in</a> to leave a comment.</p>
+            <% } %>
+
+            <div class="comments-list">
+                <% if (comments.length > 0) { %>
+                    <% comments.forEach(comment => { %>
+                        <div class="comment">
+                            <img src="<%= comment.pfp_url %>" class="comment-pfp">
+                            <div class="comment-content">
+                                <div class="comment-author">
+                                    <strong><a href="/profile/<%= comment.username %>" style="color: inherit; text-decoration: none;"><%= comment.username %></a></strong>
+                                    <span style="font-size: 0.8rem; color: var(--text-secondary);"><%= new Date(comment.created_at).toLocaleDateString() %></span>
+                                </div>
+                                <p class="comment-text"><%= comment.comment_text %></p>
+                            </div>
+                            
+                            <div class="comment-menu">
+                                <details>
+                                    <summary>⋮</summary>
+                                    <nav class="menu-dropdown">
+                                        <% if (locals.userId) { %>
+                                            <form action="/comment/<%= comment.id %>/report" method="POST">
+                                                <button type="submit">Report</button>
+                                            </form>
+                                        <% } %>
+                                        <% if (userRole === 'admin' || userRole === 'mod') { %>
+                                            <form action="/comment/<%= comment.id %>/delete" method="POST">
+                                                <button type="submit" class="delete-option">Delete</button>
+                                            </form>
+                                        <% } %>
+                                    </nav>
+                                </details>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } else { %>
+                    <p style="color: var(--text-secondary);">No comments yet. Be the first!</p>
+                <% } %>
+            </div>
+        </div>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="content-box" style="margin-bottom: 2rem;">
+            <h2>Search Filters</h2>
+            
+            <form action="/search" method="GET" class="search-filters-form" style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end;">
+                
+                <div class="form-group" style="flex: 2; min-width: 200px; margin-bottom: 0;">
+                    <label>Search Term</label>
+                    <input type="text" name="q" value="<%= query %>" placeholder="Search...">
+                </div>
+
+                <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                    <label>Look For</label>
+                    <select name="searchType" onchange="this.form.submit()">
+                        <option value="content" <%= (!filters.searchType || filters.searchType === 'content') ? 'selected' : '' %>>Content</option>
+                        <option value="users" <%= filters.searchType === 'users' ? 'selected' : '' %>>Users</option>
+                    </select>
+                </div>
+
+                <% if (!filters.searchType || filters.searchType === 'content') { %>
+                    <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                        <label>Edition</label>
+                        <select name="edition">
+                            <option value="all" <%= (!filters.edition || filters.edition === 'all') ? 'selected' : '' %>>All Editions</option>
+                            <option value="bedrock" <%= filters.edition === 'bedrock' ? 'selected' : '' %>>Bedrock</option>
+                            <option value="java" <%= filters.edition === 'java' ? 'selected' : '' %>>Java</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="flex: 1; min-width: 150px; margin-bottom: 0;">
+                        <label>Category</label>
+                        <select name="category">
+                            <option value="all" <%= (!filters.category || filters.category === 'all') ? 'selected' : '' %>>All Categories</option>
+                            <option value="texture-pack" <%= filters.category === 'texture-pack' ? 'selected' : '' %>>Texture Packs</option>
+                            <option value="addon" <%= filters.category === 'addon' ? 'selected' : '' %>>Addons</option>
+                            <option value="skin-pack" <%= filters.category === 'skin-pack' ? 'selected' : '' %>>Skin Packs</option>
+                            <option value="world" <%= filters.category === 'world' ? 'selected' : '' %>>Worlds</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="flex: 1; min-width: 100px; margin-bottom: 0;">
+                        <label>Version</label>
+                        <input type="text" name="version" value="<%= filters.version || '' %>" placeholder="e.g. 1.21">
+                    </div>
+                <% } %>
+
+                <button type="submit" class="button" style="margin-bottom: 0; height: 46px;">Search</button>
+            </form>
+            </div>
+
+        <% if (results.length > 0) { %>
+            <p>Found <%= results.length %> result(s)</p>
+            
+            <% if (filters.searchType === 'users') { %>
+                <div class="user-card-grid">
+                    <% results.forEach(user => { %>
+                        <%- include('partials/user-card', { user: user }) %>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="item-container">
+                    <% results.forEach(submission => { %>
+                        <%- include('partials/item-card', { submission: submission }) %>
+                    <% }); %>
+                </div>
+            <% } %>
+
+        <% } else { %>
+            <div class="content-box" style="text-align: center; padding: 3rem;">
+                <h3>No results found.</h3>
+                <p>Try adjusting your filters or search term.</p>
+                <a href="/" class="button">Go Home</a>
+            </div>
+        <% } %>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

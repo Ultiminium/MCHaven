@@ -1,0 +1,76 @@
+<footer>
+    <p>© 2025 MCHaven</p>
+</footer>
+
+<div id="donationModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2 style="color: var(--accent-primary);">Support MCHaven</h2>
+        <p>Thank you for supporting the site!</p>
+
+        <div class="donation-options">
+            <div class="donation-option-card">
+                <h3>💎 Crypto Support</h3>
+                <p style="margin-bottom: 1rem;">Copy an address below to send support:</p>
+                
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <strong>Bitcoin (BTC):</strong>
+                    <div class="crypto-address-box" style="font-size: 0.85rem; margin: 5px 0;">
+                        bc1q3lljvreny2vc5528jgl8kvnkntlxkcmylv576m
+                    </div>
+                </div>
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <strong>Ethereum (ETH):</strong>
+                    <div class="crypto-address-box" style="font-size: 0.85rem; margin: 5px 0;">
+                        0x671423AD39CeE7c4b9Afb63A9D1fdfA03cea1796
+                    </div>
+                </div>
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <strong>Litecoin (LTC):</strong>
+                    <div class="crypto-address-box" style="font-size: 0.85rem; margin: 5px 0;">
+                        ltc1q0xj9p7dpdaenjmf2fl4lxv4xdveaa2psfusltp
+                    </div>
+                </div>
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <strong>Solana (SOL):</strong>
+                    <div class="crypto-address-box" style="font-size: 0.85rem; margin: 5px 0;">
+                        EQ4aGHcDVaLmsiKMoy6XFZjvBD1sntmdSRdBTuv4GBHr
+                    </div>
+                </div>
+
+                <div style="text-align: left; margin-bottom: 10px;">
+                    <strong>Dogecoin (DOGE):</strong>
+                    <div class="crypto-address-box" style="font-size: 0.85rem; margin: 5px 0;">
+                        DNDt5hC3WUVPNfqfsZTjfz37TEw8Xsacve
+                    </div>
+                </div>
+            </div>
+
+            <div class="donation-option-card">
+                <h3>🎁 Send a Giftcard</h3>
+                <p>Prefer giftcards?</p>
+                <a href="mailto:mchas4000@gmail.com?subject=Giftcard Donation" class="button" style="display:inline-block; margin-top:10px;">
+                    Email Me a Code
+                </a>
+                <p style="font-size: 0.8rem; margin-top: 5px;">Or contact me for wishlist links!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% if (locals.notification && notification.type === 'rejection') { %>
+    <div id="rejectionPopup" style="position:fixed; bottom:20px; left:20px; background:var(--bg-secondary); border:2px solid #ff4444; padding:15px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.5); z-index:3000; animation: slideIn 0.5s;">
+        <h4 style="margin:0; color:#ff4444;">⚠️ Submission Rejected</h4>
+        <p style="margin:5px 0;"><%= notification.message %></p>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <a href="<%= notification.link %>" class="button" style="padding:5px 10px; font-size:0.9rem;">See Why</a>
+            <button onclick="document.getElementById('rejectionPopup').style.display='none'" style="background:none; border:none; color:var(--text-secondary); cursor:pointer;">Dismiss</button>
+        </div>
+    </div>
+    <style>
+        @keyframes slideIn { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+<% } %>

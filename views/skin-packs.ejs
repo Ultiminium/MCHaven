@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="item-container">
+            <% if (submissions.length > 0) { %>
+                <% submissions.forEach(submission => { %>
+                    <%- include('partials/item-card', { submission: submission }) %>
+                <% }); %>
+            <% } else { %>
+                <p>No skin packs have been submitted yet. Be the first!</p>
+            <% } %>
+        </div>
+        <%- include('partials/pagination', { currentPage, totalPages, baseUrl: '/skin-packs.html' }) %>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body id="settings-page">
+    <%- include('partials/header'); %>
+    <main>
+        <% if (locals.message) { %>
+            <div class="message <%= locals.messageType %>">
+                <p><%= locals.message %></p>
+            </div>
+        <% } %>
+
+        <div class="settings-grid">
+            <div class="setting-card">
+                <h3>Change Profile Picture</h3>
+                <form action="/settings/pfp" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="file" name="newPfpFile" accept="image/png, image/jpeg, image/webp" required>
+                    </div>
+                    <button type="submit" class="button">Upload New Picture</button>
+                </form>
+            </div>
+
+            <div class="setting-card">
+                <h3>Change Username</h3>
+                <p>You can change your username once every 7 days.</p>
+                <form action="/settings/username" method="POST">
+                    <div class="form-group">
+                        <input type="text" name="newUsername" placeholder="Enter new username..." required minlength="3">
+                    </div>
+                    <button type="submit" class="button">Change Username</button>
+                </form>
+            </div>
+
+            <div class="setting-card">
+                <h3>Color Theme</h3>
+                <div class="theme-options">
+                    <button class="theme-button" data-theme="default" style="background: #1a1122; color: #e6e0f0;">Dark Purple</button>
+                    <button class="theme-button" data-theme="green" style="background: #121212; color: #e0e0e0;">Original Green</button>
+                </div>
+            </div>
+             <div class="setting-card">
+                <h3>Colorblind Friendly Themes</h3>
+                <p>These themes use color combinations optimized for different types of color vision deficiency.</p>
+                <div class="theme-options">
+                    <button class="theme-button" data-theme="deuteranopia" style="background: #1f1f2e; color: #f0f0ff;">Deuteranopia</button>
+                    <button class="theme-button" data-theme="protanopia" style="background: #1d1d1d; color: #ffffff;">Protanopia</button>
+                </div>
+            </div>
+             
+            <div class="setting-card">
+                <h3>Custom Accent Color</h3>
+                <p>Override the current theme's accent color with your own.</p>
+                <div class="form-group" style="flex-direction: row; align-items: center; gap: 1rem;">
+                    <input type="text" id="custom-color-input" placeholder="#FFFFFF" style="max-width: 150px;">
+                    <button id="set-custom-color-btn" class="button">Set Color</button>
+                </div>
+            </div>
+
+            <div class="setting-card">
+                <h3>Content Layout</h3>
+                <div class="layout-options">
+                    <label><input type="radio" name="layout" value="grid"> Default (Grid)</label>
+                    <label><input type="radio" name="layout" value="list"> Lined (List)</label>
+                </div>
+            </div>
+        </div>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+    <script src="/theme.js"></script>
+</body>
+</html>

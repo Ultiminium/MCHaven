@@ -1,0 +1,13 @@
+<a href="/submission/<%= submission.id %>" class="item-card">
+    <img src="<%= submission.thumbnail_url %>" alt="Thumbnail for <%= submission.title %>">
+    <div class="info">
+        <h3><%= submission.title %></h3>
+        <div class="card-meta-info">
+            <span class="category-tag"><%= submission.category.replace('-', ' ') %></span>
+            <% if (submission.supported_versions) { %>
+                <span class="version-tag"><%= submission.supported_versions %></span>
+            <% } %>
+        </div>
+        <div class="description"><%= submission.description %></div>
+    </div>
+</a>

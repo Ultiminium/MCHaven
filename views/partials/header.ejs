@@ -1,0 +1,22 @@
+<header>
+    <h1><%= pageTitle %></h1>
+    <p>A hub for Minecraft Bedrock Edition content.</p>
+    <div class="header-right" id="header-right-container"></div>
+</header>
+<nav>
+    <a href="/" class="<%= pageTitle === 'Home' ? 'active' : '' %>">Home</a>
+    <a href="/texture-packs.html" class="<%= pageTitle === 'Texture Packs' ? 'active' : '' %>">Texture Packs</a>
+    <a href="/addons.html" class="<%= pageTitle === 'Addons' ? 'active' : '' %>">Addons</a>
+    <a href="/skin-packs.html" class="<%= pageTitle === 'Skin Packs' ? 'active' : '' %>">Skin Packs</a>
+    <a href="/worlds.html" class="<%= pageTitle === 'Worlds' ? 'active' : '' %>">Worlds</a>
+    
+    <a href="/useful.html" class="<%= pageTitle === 'Useful' ? 'active' : '' %>">Useful</a>
+    
+    <a href="/information.html" class="<%= pageTitle === 'Information' ? 'active' : '' %>">Information</a>
+
+    <% if (userRole === 'admin' || userRole === 'mod') { %>
+        <a href="/admin" class="<%= pageTitle === 'Admin Moderation' ? 'active' : '' %>">Admin</a>
+    <% } %>
+    
+    <a href="/settings.html" class="<%= pageTitle === 'Settings' ? 'active' : '' %>">Settings</a>
+</nav>

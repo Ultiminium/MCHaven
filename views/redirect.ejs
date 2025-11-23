@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <section class="content-box" style="text-align: center; max-width: 600px; margin: auto;">
+            <h1>Leaving MCHaven</h1>
+            <p style="color: red; font-weight: bold;">You are being redirected to an external site. MCHaven is not responsible for the content of external pages.</p>
+            <a href="<%= downloadUrl %>" class="button" style="margin-top: 1rem;">Click Here to Proceed to Download</a>
+        </section>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+</body>
+</html>
