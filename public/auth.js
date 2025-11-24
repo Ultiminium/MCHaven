@@ -15,13 +15,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         </a>
                     `).join('');
                 }
-
-                // Add "Add Account" option
                 accountsHTML += `<hr style="margin:5px 0; border:0; border-top:1px solid #555;"><a href="/add-account">Add Account +</a>`;
 
                 headerRight.innerHTML = `
                     ${donateButtonHTML}
-                    <a href="/submission.html" class="submit-button-special">SUBMIT</a>
+                    <a href="/submission" class="submit-button-special">SUBMIT</a>
                     
                     <form action="/search" method="GET" class="search-form">
                         <input type="search" name="q" placeholder="Search..." required>
@@ -46,18 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Dropdown Logic
                 const dropBtn = headerRight.querySelector('.dropdown button');
                 const dropContent = headerRight.querySelector('.dropdown-content');
-                
-                dropBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    dropContent.style.display = dropContent.style.display === 'block' ? 'none' : 'block';
-                });
-                
-                window.addEventListener('click', () => {
-                    dropContent.style.display = 'none';
-                });
+                dropBtn.addEventListener('click', (e) => { e.stopPropagation(); dropContent.style.display = dropContent.style.display === 'block' ? 'none' : 'block'; });
+                window.addEventListener('click', () => { dropContent.style.display = 'none'; });
 
             } else {
-                // Logged Out View
                 headerRight.innerHTML = `
                     ${donateButtonHTML}
                     <form action="/search" method="GET" class="search-form">
@@ -69,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             }
 
-            // Modal Logic (Donation)
+            // Modal Logic
             const modal = document.getElementById("donationModal");
             const btn = document.getElementById("openDonateBtn");
             const span = document.getElementsByClassName("close-modal")[0];
