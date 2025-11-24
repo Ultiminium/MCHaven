@@ -1,5 +1,5 @@
 // ============================================================
-// 1. CONFIGURATION
+// 1. CONFIGURATION & IMPORTS
 // ============================================================
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
@@ -14,39 +14,72 @@ const crypto = require('crypto');
 const app = express();
 const PORT = 3000;
 const SALT_ROUNDS = 10;
-const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+const SEVEN_DAYS_IN_MS = 7 * 24 * 60 * 60 * 1000;
 
-app.disable('x-powered-by'); // Security: Hide tech stack
+// Security: Hide tech stack
+app.disable('x-powered-by');
+
+// Middleware
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
-    secret: 'CHANGE_THIS_TO_A_REALLY_LONG_RANDOM_STRING_98234', // <--- CHANGE THIS
+    secret: 'CHANGE_THIS_TO_A_REALLY_LONG_RANDOM_STRING_12345', // <--- CHANGE THIS IN PRODUCTION
     resave: false,
     saveUninitialized: false,
-    cookie: { httpOnly: true, maxAge: SEVEN_DAYS }
+    cookie: { httpOnly: true, maxAge: SEVEN_DAYS_IN_MS }
 }));
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// Email Configuration
 const transporter = nodemailer.createTransport({
     service: 'gmail',
-    auth: { user: 'spencer@northwinns.com', pass: 'nqbrjapzkkecfpyv' }
+    auth: { 
+        user: 'spencer@northwinns.com', 
+        pass: 'nqbrjapzkkecfpyv' 
+    }
 });
 
 // ============================================================
-// 2. DATABASE & MIGRATIONS
+// 2. DATABASE CONNECTION & MIGRATIONS
 // ============================================================
 const db = new sqlite3.Database('./database.db', (err) => {
-    if (err) console.error(err.message); else console.log("✅ DB Connected.");
+    if (err) console.error(err.message);
+    else console.log("✅ DB Connected.");
+    
     db.serialize(() => {
+        // Create Tables
         const tables = [
-            `CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, email TEXT UNIQUE, password_hash TEXT, role TEXT DEFAULT 'user', pfp_url TEXT, username_last_changed_at TIMESTAMP, status TEXT DEFAULT 'active', termination_reason TEXT, bio TEXT, reset_token TEXT, reset_token_expires TIMESTAMP, reset_attempts INTEGER DEFAULT 0, tos_accepted INTEGER DEFAULT 0)`,
-            `CREATE TABLE IF NOT EXISTS submissions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, category TEXT, title TEXT, thumbnail_url TEXT, description TEXT, download_url TEXT, credit_url TEXT, supported_versions TEXT, image_url_1 TEXT, image_url_2 TEXT, image_url_3 TEXT, tags TEXT, edition TEXT DEFAULT 'bedrock', rejection_reason TEXT, rejection_advice TEXT, rejection_seen INTEGER DEFAULT 0, is_featured INTEGER DEFAULT 0, status TEXT DEFAULT 'pending', submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`,
-            `CREATE TABLE IF NOT EXISTS submission_edits (id INTEGER PRIMARY KEY AUTOINCREMENT, submission_id INTEGER, user_id INTEGER, category TEXT, title TEXT, thumbnail_url TEXT, description TEXT, download_url TEXT, credit_url TEXT, supported_versions TEXT, image_url_1 TEXT, image_url_2 TEXT, image_url_3 TEXT, tags TEXT, edition TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`,
-            `CREATE TABLE IF NOT EXISTS comments (id INTEGER PRIMARY KEY AUTOINCREMENT, submission_id INTEGER, user_id INTEGER, comment_text TEXT, status TEXT DEFAULT 'visible', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(submission_id) REFERENCES submissions(id), FOREIGN KEY(user_id) REFERENCES users(id))`,
-            `CREATE TABLE IF NOT EXISTS followers (id INTEGER PRIMARY KEY AUTOINCREMENT, follower_id INTEGER, following_id INTEGER, UNIQUE(follower_id, following_id))`,
-            `CREATE TABLE IF NOT EXISTS notifications (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, type TEXT, message TEXT, link TEXT, seen INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`
+            `CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE, email TEXT UNIQUE, password_hash TEXT, 
+                role TEXT DEFAULT 'user', pfp_url TEXT, username_last_changed_at TIMESTAMP, status TEXT DEFAULT 'active', 
+                termination_reason TEXT, bio TEXT, reset_token TEXT, reset_token_expires TIMESTAMP, reset_attempts INTEGER DEFAULT 0, 
+                tos_accepted INTEGER DEFAULT 0
+            )`,
+            `CREATE TABLE IF NOT EXISTS submissions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, category TEXT, title TEXT, thumbnail_url TEXT, description TEXT, 
+                download_url TEXT, credit_url TEXT, supported_versions TEXT, image_url_1 TEXT, image_url_2 TEXT, image_url_3 TEXT, 
+                tags TEXT, edition TEXT DEFAULT 'bedrock', rejection_reason TEXT, rejection_advice TEXT, rejection_seen INTEGER DEFAULT 0, 
+                is_featured INTEGER DEFAULT 0, status TEXT DEFAULT 'pending', submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`,
+            `CREATE TABLE IF NOT EXISTS submission_edits (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, submission_id INTEGER, user_id INTEGER, category TEXT, title TEXT, 
+                thumbnail_url TEXT, description TEXT, download_url TEXT, credit_url TEXT, supported_versions TEXT, 
+                image_url_1 TEXT, image_url_2 TEXT, image_url_3 TEXT, tags TEXT, edition TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`,
+            `CREATE TABLE IF NOT EXISTS comments (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, submission_id INTEGER, user_id INTEGER, comment_text TEXT, 
+                status TEXT DEFAULT 'visible', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+                FOREIGN KEY(submission_id) REFERENCES submissions(id), FOREIGN KEY(user_id) REFERENCES users(id)
+            )`,
+            `CREATE TABLE IF NOT EXISTS followers (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, follower_id INTEGER, following_id INTEGER, UNIQUE(follower_id, following_id)
+            )`,
+            `CREATE TABLE IF NOT EXISTS notifications (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, type TEXT, message TEXT, link TEXT, 
+                seen INTEGER DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )`
         ];
         tables.forEach(t => db.run(t));
 
@@ -61,16 +94,18 @@ const db = new sqlite3.Database('./database.db', (err) => {
 });
 
 // ============================================================
-// 3. UPLOAD CONFIG (Sanitized)
+// 3. FILE UPLOAD (Sanitized)
 // ============================================================
 const storage = multer.diskStorage({
     destination: (req, f, cb) => {
-        let d = 'public/thumbnails/';
-        if(f.fieldname.includes('Pfp')) d = 'public/pfps/';
-        if(f.fieldname.includes('download')) d = 'public/downloads/'; 
-        fs.mkdirSync(d, { recursive: true }); cb(null, d);
+        let dest = 'public/thumbnails/';
+        if (f.fieldname.includes('Pfp')) dest = 'public/pfps/';
+        if (f.fieldname.includes('download')) dest = 'public/downloads/';
+        fs.mkdirSync(dest, { recursive: true }); 
+        cb(null, dest);
     },
     filename: (req, f, cb) => {
+        // FIX: Remove spaces and special chars to prevent broken links
         const safeName = f.originalname.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9._-]/g, '');
         cb(null, Date.now() + '-' + safeName);
     }
@@ -78,7 +113,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // ============================================================
-// 4. MIDDLEWARE
+// 4. GLOBAL MIDDLEWARE (Auth, ToS, Notifications)
 // ============================================================
 const notify = (uid, msg, link) => db.run("INSERT INTO notifications (user_id, type, message, link) VALUES (?, 'alert', ?, ?)", [uid, msg, link]);
 
@@ -91,12 +126,20 @@ app.use((req, res, next) => {
     if (user) {
         db.get("SELECT * FROM users WHERE id=?", [user.id], (err, dbUser) => {
             if (!dbUser) { delete req.session.users[uid]; req.session.activeUserId = null; return next(); }
+            
+            // Termination Check
             if (dbUser.status === 'terminated') { 
                 req.session.destroy(); 
                 return res.render('message', { pageTitle:'Banned', type: 'error', title: 'Account Terminated', message: `Reason: ${dbUser.termination_reason}` }); 
             }
-            if (dbUser.tos_accepted === 0 && !['/terms', '/accept-terms', '/logout'].includes(req.path) && !req.path.startsWith('/auth/')) return res.redirect('/terms');
             
+            // ToS Check
+            const safePaths = ['/terms', '/accept-terms', '/logout'];
+            if (dbUser.tos_accepted === 0 && !safePaths.includes(req.path) && !req.path.startsWith('/auth/')) {
+                return res.redirect('/terms');
+            }
+            
+            // Notification Check
             db.get("SELECT * FROM notifications WHERE user_id=? AND seen=0 ORDER BY created_at DESC LIMIT 1", [user.id], (e, notif) => {
                 if (notif) { res.locals.notification = notif; db.run("UPDATE notifications SET seen=1 WHERE id=?", [notif.id]); }
                 next();
@@ -106,17 +149,24 @@ app.use((req, res, next) => {
 });
 
 // ============================================================
-// 5. AUTHENTICATION & ACCOUNTS
+// 5. AUTHENTICATION (No IP Tracking)
 // ============================================================
 const loginUser = (req, u) => { 
     if(!req.session.users) req.session.users={}; 
     req.session.users[u.id] = { id:u.id, username:u.username, role:u.role, pfp_url:u.pfp_url }; 
     req.session.activeUserId = u.id; 
 };
+
 app.get('/api/user/status', (req, res) => { 
     const uid = req.session.activeUserId; 
-    res.json(uid ? { isLoggedIn: true, username: req.session.users[uid].username, role: req.session.users[uid].role, accounts: Object.values(req.session.users).map(u => ({ id: u.id, username: u.username, isActive: u.id == uid })) } : { isLoggedIn: false }); 
+    res.json(uid ? { 
+        isLoggedIn: true, 
+        username: req.session.users[uid].username, 
+        role: req.session.users[uid].role, 
+        accounts: Object.values(req.session.users).map(u => ({ id: u.id, username: u.username, isActive: u.id == uid })) 
+    } : { isLoggedIn: false }); 
 });
+
 app.get('/auth/switch/:id', (req, res) => { if (req.session.users[req.params.id]) req.session.activeUserId = req.params.id; res.redirect('back'); });
 app.get('/add-account', (req, res) => res.render('login', { pageTitle: 'Add Account' }));
 app.get('/logout', (req, res) => { if(req.session.activeUserId) delete req.session.users[req.session.activeUserId]; req.session.activeUserId = Object.keys(req.session.users)[0] || null; res.redirect('/'); });
@@ -125,7 +175,8 @@ app.post('/register', upload.single('pfpFile'), async (req, res) => {
     const { username, email, password } = req.body; 
     const pfp = req.file ? `/pfps/${req.file.filename}` : '/pfps/defaults/default.png';
     const hash = await bcrypt.hash(password, SALT_ROUNDS);
-    // Security: Validate username chars
+    
+    // Security: Regex for username
     if (!/^[a-zA-Z0-9_-]+$/.test(username)) return res.render('message', {pageTitle:'Error', type:'error', title:'Invalid Username', message:'Letters/Numbers/Underscores only.'});
     
     db.run("INSERT INTO users (username, email, password_hash, pfp_url, tos_accepted) VALUES (?, ?, ?, ?, 0)", [username, email, hash, pfp], function(err) {
@@ -141,12 +192,13 @@ app.post('/login', (req, res) => {
     });
 });
 
-// --- SECURE PASSWORD RESET ---
+// --- SECURE PASSWORD RESET (Username + Email + 3 Strikes) ---
 app.get('/forgot-password', (req, res) => res.render('forgot', { pageTitle: 'Forgot', message: null }));
 app.post('/forgot-password', (req, res) => {
     const { username, email } = req.body;
     db.get("SELECT * FROM users WHERE username=? AND email=?", [username, email], (err, user) => {
         if (!user) return res.render('forgot', { pageTitle: 'Forgot', message: 'If credentials match, a code has been sent.' });
+        
         const token = crypto.randomInt(100000, 999999).toString();
         db.run("UPDATE users SET reset_token=?, reset_token_expires=?, reset_attempts=0 WHERE id=?", [token, Date.now()+3600000, user.id], () => {
             transporter.sendMail({ from: '"MCHaven Security" <spencer@northwinns.com>', to: email, subject: 'Reset Code', text: `Code: ${token}\nExpires in 1 hour.` });
@@ -161,7 +213,7 @@ app.post('/reset-password', async (req, res) => {
         if (u.reset_attempts >= 3) { db.run("UPDATE users SET reset_token=NULL WHERE id=?", [u.id]); return res.render('message', { pageTitle:'Locked', type:'error', title:'Locked', message:'Too many failed attempts.' }); }
         if (u.reset_token !== req.body.code || Date.now() > u.reset_token_expires) {
             db.run("UPDATE users SET reset_attempts = reset_attempts + 1 WHERE id=?", [u.id]);
-            return res.render('reset', { pageTitle: 'Reset', email: req.body.email, message: `Invalid Code. (${u.reset_attempts + 1}/3)` });
+            return res.render('reset', { pageTitle: 'Reset', email: req.body.email, message: `Invalid Code. (${u.reset_attempts + 1}/3 attempts)` });
         }
         const hash = await bcrypt.hash(req.body.newPassword, SALT_ROUNDS);
         db.run("UPDATE users SET password_hash=?, reset_token=NULL, reset_attempts=0 WHERE id=?", [hash, u.id], () => res.redirect('/login.html?success=PasswordReset'));
@@ -169,7 +221,7 @@ app.post('/reset-password', async (req, res) => {
 });
 
 // ============================================================
-// 6. SEARCH & CONTENT
+// 6. SEARCH & EDITING
 // ============================================================
 app.get('/search', (req, res) => {
     const { q, edition, category, version, searchType } = req.query;
@@ -205,10 +257,11 @@ app.post('/edit/:id', upload.fields([{ name: 'thumbnailFile', maxCount: 1 }, { n
 
         db.run(`INSERT INTO submission_edits (submission_id, user_id, category, title, thumbnail_url, description, download_url, credit_url, supported_versions, tags, edition, image_url_1, image_url_2, image_url_3) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, 
             [req.params.id, req.session.activeUserId, req.body.category, req.body.title, thumb, req.body.description, dl, req.body.credit, req.body.supported_versions, req.body.tags, req.body.edition, i1, i2, i3],
-            (err) => res.render('message', {pageTitle:'Success', type:'success', title:'Edit Submitted', message:'Changes pending review.'}));
+            (err) => res.render('message', {pageTitle:'Success', type:'success', title:'Edit Submitted', message:'Your changes are pending review.'}));
     });
 });
 
+// --- SUBMISSIONS ---
 app.post('/submit', upload.fields([{ name: 'thumbnailFile', maxCount: 1 }, { name: 'downloadFile', maxCount: 1 }, { name: 'imageFile1', maxCount: 1 }, { name: 'imageFile2', maxCount: 1 }, { name: 'imageFile3', maxCount: 1 }]), (req, res) => {
     if (!req.session.activeUserId) return res.status(401).send("Login.");
     const { category, title, description, downloadLink, credit, supported_versions, tags, edition } = req.body;
@@ -230,7 +283,7 @@ app.post('/submission/delete/:id', (req, res) => {
     });
 });
 
-// --- ADMIN DASHBOARD ---
+// --- ADMIN DASHBOARD & ACTIONS ---
 app.get('/admin', (req, res) => {
     if(!req.session.activeUserId || !['admin','mod'].includes(req.session.users[req.session.activeUserId].role)) return res.render('message', {pageTitle:'Error', type:'error', title:'Forbidden', message:'Access Denied'});
     db.all("SELECT * FROM submissions WHERE status='pending' ORDER BY submitted_at DESC", (e,s) => 
@@ -250,7 +303,7 @@ app.post('/admin/terminate/:id', (req, res) => { if(req.session.users[req.sessio
 app.post('/admin/user/:id/dismiss', (req, res) => { if(['admin','mod'].includes(req.session.users[req.session.activeUserId]?.role)) db.run("UPDATE users SET status='active' WHERE id=?", [req.params.id], ()=>res.redirect('/admin')); });
 app.post('/admin/comment/delete/:id', (req, res) => { if(['admin','mod'].includes(req.session.users[req.session.activeUserId]?.role)) db.run("DELETE FROM comments WHERE id=?", [req.params.id], ()=>res.redirect('/admin')); });
 
-// --- PAGES (Standard) ---
+// --- PAGES & PROFILE ---
 const renderCat = (c, t, v, req, res) => { const u = req.session.activeUserId, l = 12, p = parseInt(req.query.page)||1, o = (p-1)*l; db.get("SELECT COUNT(id) as t FROM submissions WHERE category=? AND status='approved'", [c], (e,r) => { const q = u ? `SELECT s.* FROM submissions s LEFT JOIN followers f ON s.user_id=f.following_id AND f.follower_id=? WHERE s.category=? AND s.status='approved' ORDER BY CASE WHEN f.follower_id IS NOT NULL THEN 0 ELSE 1 END, s.submitted_at DESC LIMIT ? OFFSET ?` : `SELECT * FROM submissions WHERE category=? AND status='approved' ORDER BY submitted_at DESC LIMIT ? OFFSET ?`; db.all(q, u ? [u,c,l,o] : [c,l,o], (e,rows) => res.render(v, {pageTitle:t, submissions:rows, currentPage:p, totalPages:Math.ceil((r?r.t:0)/l), baseUrl:`/${v}`})); }); };
 ['texture-pack','addon','skin-pack','world'].forEach(c => app.get(`/${c}s`, (req,res) => renderCat(c, c.split('-').map(w=>w[0].toUpperCase()+w.slice(1)).join(' ')+'s', c+'s', req, res)));
 app.get('/useful', (req,res) => renderCat('useful', 'Useful', 'useful', req, res)); app.get('/', (req,res) => res.render('index', {pageTitle:'Home'})); app.get('/featured', (req,res) => db.all("SELECT * FROM submissions WHERE is_featured=1 AND status='approved'", (e,rows) => res.render('featured', {pageTitle:'Featured', submissions:rows}))); app.get('/information', (req,res) => res.render('information', {pageTitle:'Info'}));
@@ -258,20 +311,19 @@ app.get('/settings', (req,res) => req.session.activeUserId ? db.get("SELECT bio 
 app.get('/submission', (req,res) => res.render('submission', {pageTitle:'Submit'})); app.get('/register.html', (req,res) => res.render('register', {pageTitle:'Register'})); app.get('/login.html', (req,res) => res.render('login', {pageTitle:'Login'})); app.get('/terms', (req,res) => req.session.activeUserId ? res.render('terms', {pageTitle:'ToS'}) : res.redirect('/login.html')); app.post('/accept-terms', (req,res) => req.session.activeUserId ? db.run("UPDATE users SET tos_accepted=1 WHERE id=?", [req.session.activeUserId], ()=>res.redirect('/')) : res.redirect('/login.html'));
 app.get('/submission/:id', (req, res) => { db.get("SELECT * FROM submissions WHERE id=?", [req.params.id], (e,s) => { if(!s) return res.status(404).send("Not found"); const o = s.user_id === req.session.activeUserId; if(s.status !== 'approved' && !o && !['admin','mod'].includes(req.session.users[req.session.activeUserId]?.role)) return res.status(404).send("Not found"); if(o && s.status === 'rejected' && s.rejection_seen === 0) db.run("UPDATE submissions SET rejection_seen = 1 WHERE id = ?", [s.id]); db.all("SELECT c.*, u.username, u.pfp_url FROM comments c JOIN users u ON c.user_id=u.id WHERE c.submission_id=? ORDER BY c.created_at DESC", [req.params.id], (e,c) => res.render('detail', {pageTitle:s.title, submission:s, comments:c})); }); });
 app.get('/profile/:username', (req, res) => db.get("SELECT * FROM users WHERE username=?", [req.params.username], (e,u) => u ? db.all((u.id===req.session.activeUserId)?"SELECT * FROM submissions WHERE user_id=? ORDER BY submitted_at DESC":"SELECT * FROM submissions WHERE user_id=? AND status='approved' ORDER BY submitted_at DESC", [u.id], (e,s) => res.render('profile', {pageTitle:u.username, profileUser:u, submissions:s, followerCount:0, isFollowing:false})) : res.status(404).send("Not Found")));
-app.post('/submission/delete/:id', (req, res) => db.get("SELECT user_id FROM submissions WHERE id=?", [req.params.id], (e,s) => (s && (s.user_id == req.session.activeUserId || ['admin','mod'].includes(req.session.users[req.session.activeUserId].role))) ? db.run("DELETE FROM submissions WHERE id=?", [req.params.id], ()=>res.redirect('/')) : res.status(403).send("No")));
-app.post('/submission/:id/comment', (req,res) => req.session.activeUserId ? db.run("INSERT INTO comments (submission_id, user_id, comment_text) VALUES (?, ?, ?)", [req.params.id, req.session.activeUserId, req.body.comment_text], ()=>res.redirect(`/submission/${req.params.id}`)) : res.redirect('back'));
-app.post('/comment/:id/report', (req,res) => db.run("UPDATE comments SET status='reported' WHERE id=?", [req.params.id], ()=>res.redirect('back')));
+const checkAuth = (req,res,next) => req.session.activeUserId ? next() : res.redirect('/login.html');
+const checkAdmin = (req,res,next) => req.session.users[req.session.activeUserId]?.role === 'admin' ? next() : res.status(403).send("No");
+app.post('/submission/:id/comment', checkAuth, (req,res) => db.run("INSERT INTO comments (submission_id, user_id, comment_text) VALUES (?, ?, ?)", [req.params.id, req.session.activeUserId, req.body.comment_text], ()=>res.redirect(`/submission/${req.params.id}`)));
+app.post('/comment/:id/report', checkAuth, (req,res) => db.run("UPDATE comments SET status='reported' WHERE id=?", [req.params.id], ()=>res.redirect('back')));
 app.post('/comment/:id/delete', (req,res) => (['admin','mod'].includes(req.session.users[req.session.activeUserId]?.role)) ? db.run("DELETE FROM comments WHERE id=?", [req.params.id], ()=>res.redirect('back')) : res.status(403).send("No"));
-app.post('/profile/:username/follow', (req,res) => db.get("SELECT id FROM users WHERE username=?",[req.params.username],(e,u)=> u && db.run("INSERT INTO followers (follower_id,following_id) VALUES (?,?)",[req.session.activeUserId,u.id],()=>res.redirect('back'))));
-app.post('/profile/:username/unfollow', (req,res) => db.get("SELECT id FROM users WHERE username=?",[req.params.username],(e,u)=> u && db.run("DELETE FROM followers WHERE follower_id=? AND following_id=?",[req.session.activeUserId,u.id],()=>res.redirect('back'))));
-app.post('/profile/:username/report', (req,res) => db.run("UPDATE users SET status='reported' WHERE username=?",[req.params.username],()=>res.redirect('back')));
-app.post('/profile/:username/promote', (req,res) => req.session.users[req.session.activeUserId].role==='admin' ? db.run("UPDATE users SET role='mod' WHERE username=?",[req.params.username],()=>res.redirect('back')) : res.status(403).send());
-app.post('/profile/:username/demote', (req,res) => req.session.users[req.session.activeUserId].role==='admin' ? db.run("UPDATE users SET role='user' WHERE username=?",[req.params.username],()=>res.redirect('back')) : res.status(403).send());
-app.post('/settings/pfp', upload.single('newPfpFile'), (req,res) => req.file ? db.run("UPDATE users SET pfp_url=? WHERE id=?", [`/pfps/${req.file.filename}`, req.session.activeUserId], ()=>res.redirect('/settings.html?success=PfpUpdated')) : res.redirect('/settings.html'));
-app.post('/settings/bio', (req,res) => db.run("UPDATE users SET bio=? WHERE id=?", [req.body.bio, req.session.activeUserId], ()=>res.redirect('/settings.html?success=BioUpdated')));
-app.post('/settings/username', (req,res) => {
-    db.get("SELECT id FROM users WHERE username=?", [req.body.newUsername], (e,ex) => { if(ex) return res.redirect('/settings.html?error=Taken'); db.get("SELECT username_last_changed_at FROM users WHERE id=?", [req.session.activeUserId], (e,u) => { if(req.session.users[req.session.activeUserId].role !== 'admin' && u.username_last_changed_at && Date.now()-new Date(u.username_last_changed_at).getTime() < SEVEN_DAYS) return res.redirect('/settings.html?error=UsernameCooldown'); db.run("UPDATE users SET username=?, username_last_changed_at=CURRENT_TIMESTAMP WHERE id=?", [req.body.newUsername, req.session.activeUserId], ()=>res.redirect('/settings.html?success=Updated')); }); });
-});
+app.post('/profile/:username/follow', checkAuth, (req,res) => db.get("SELECT id FROM users WHERE username=?",[req.params.username],(e,u)=> u && db.run("INSERT INTO followers (follower_id,following_id) VALUES (?,?)",[req.session.activeUserId,u.id],()=>res.redirect('back'))));
+app.post('/profile/:username/unfollow', checkAuth, (req,res) => db.get("SELECT id FROM users WHERE username=?",[req.params.username],(e,u)=> u && db.run("DELETE FROM followers WHERE follower_id=? AND following_id=?",[req.session.activeUserId,u.id],()=>res.redirect('back'))));
+app.post('/profile/:username/report', checkAuth, (req,res) => db.run("UPDATE users SET status='reported' WHERE username=?",[req.params.username],()=>res.redirect('back')));
+app.post('/profile/:username/promote', checkAdmin, (req,res) => db.run("UPDATE users SET role='mod' WHERE username=?",[req.params.username],()=>res.redirect('back')));
+app.post('/profile/:username/demote', checkAdmin, (req,res) => db.run("UPDATE users SET role='user' WHERE username=?",[req.params.username],()=>res.redirect('back')));
+app.post('/settings/pfp', upload.single('newPfpFile'), checkAuth, (req,res) => req.file ? db.run("UPDATE users SET pfp_url=? WHERE id=?", [`/pfps/${req.file.filename}`, req.session.activeUserId], ()=>res.redirect('/settings.html?success=PfpUpdated')) : res.redirect('/settings.html'));
+app.post('/settings/bio', checkAuth, (req,res) => db.run("UPDATE users SET bio=? WHERE id=?", [req.body.bio, req.session.activeUserId], ()=>res.redirect('/settings.html?success=BioUpdated')));
+app.post('/settings/username', checkAuth, (req,res) => db.get("SELECT id FROM users WHERE username=?", [req.body.newUsername], (e,ex) => ex ? res.redirect('/settings.html?error=Taken') : db.run("UPDATE users SET username=? WHERE id=?", [req.body.newUsername, req.session.activeUserId], ()=>res.redirect('/settings.html?success=Updated'))));
 app.get('/download-redirect', (req, res) => res.render('redirect', { downloadUrl: req.query.url, pageTitle: 'Download' }));
 
 app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));

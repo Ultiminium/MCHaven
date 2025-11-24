@@ -1,0 +1,76 @@
+<div id="timer-ad-popup" style="display:none; position:fixed; bottom:20px; right:20px; width:320px; background:var(--bg-secondary); border:2px solid var(--accent-primary); border-radius:8px; padding:15px; z-index:9999; box-shadow:0 4px 20px rgba(0,0,0,0.8); animation: slideUp 0.5s;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h4 style="margin:0; color:var(--accent-primary); font-size:0.9rem;">Sponsored Message</h4>
+        <button onclick="closeTimerAd()" style="background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;">&times;</button>
+    </div>
+    
+    <a href="https://billing.apexminecrafthosting.com/aff.php?aff=16173" target="_blank" style="display:block; text-decoration:none;">
+        <img src="/images/apex_ad.png" alt="Host your own Minecraft Server" style="width:100%; height:auto; border-radius:4px; border:1px solid #444;">
+        <div style="background:#4CAF50; color:white; text-align:center; padding:5px; margin-top:5px; border-radius:4px; font-weight:bold; font-size:0.9rem;">
+            Start Your Own Server &raquo;
+        </div>
+    </a>
+    
+    <p style="font-size:0.7rem; color:var(--text-secondary); margin-top:5px; text-align:center;">
+        Supports MCHaven.xyz
+    </p>
+</div>
+
+<div id="milestone-ad-modal" class="modal">
+    <div class="modal-content" style="border: 2px solid gold; max-width:400px;">
+        <span class="close-modal" onclick="document.getElementById('milestone-ad-modal').style.display='none'">&times;</span>
+        <h2 style="color: gold;">🎉 9 Downloads!</h2>
+        <p>You are a power user. Need a server to play these on?</p>
+        
+        <a href="https://billing.apexminecrafthosting.com/aff.php?aff=16173" target="_blank" style="display:block; margin:20px 0; text-decoration:none;">
+            <div style="background:var(--bg-primary); padding:20px; border-radius:8px; border:1px dashed gold; text-align:center;">
+                <h3 style="color:#4CAF50; margin:0 0 10px 0;">Apex Hosting</h3>
+                <p style="color:var(--text-primary); margin:0;">24/7 Support • Lag Free • 1-Click Install</p>
+                <button class="button" style="background:#4CAF50; margin-top:10px;">Get Started</button>
+            </div>
+        </a>
+        
+        <button class="button" onclick="document.getElementById('milestone-ad-modal').style.display='none'" style="background:transparent; border:1px solid #555;">Continue Downloading</button>
+    </div>
+</div>
+
+<style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const lastAd = localStorage.getItem('lastAdTime');
+        // Logic: Show every 30 minutes
+        if (!lastAd || Date.now() - lastAd > 30*60*1000) {
+            const pop = document.getElementById('timer-ad-popup');
+            if(pop) { 
+                pop.style.display = 'block'; 
+                // Auto-close after 1 minute so it's not annoying
+                setTimeout(() => closeTimerAd(), 60000); 
+            }
+        }
+        
+        // Logic: Check if milestone flag was set by download button
+        if (localStorage.getItem('showMilestoneAd') === 'true') {
+            const mod = document.getElementById('milestone-ad-modal');
+            if(mod) { 
+                mod.style.display = 'block'; 
+                localStorage.setItem('showMilestoneAd', 'false'); 
+            }
+        }
+    });
+
+    function closeTimerAd() { 
+        document.getElementById('timer-ad-popup').style.display='none'; 
+        localStorage.setItem('lastAdTime', Date.now()); 
+    }
+    
+    // This is called by the download buttons in detail.ejs
+    function trackDownload() {
+        let c = parseInt(localStorage.getItem('downloadCount') || '0') + 1;
+        localStorage.setItem('downloadCount', c);
+        if (c % 9 === 0) { 
+            const mod = document.getElementById('milestone-ad-modal'); 
+            if(mod) mod.style.display='block'; 
+        }
+    }
+</script>

@@ -10,7 +10,12 @@
     <a href="/skin-packs">Skin Packs</a>
     <a href="/worlds">Worlds</a>
     <a href="/useful">Useful</a>
-    <a href="/featured" style="color:gold;">Featured</a> <a href="/information">Information</a>
-    <% if (userRole === 'admin' || userRole === 'mod') { %><a href="/admin">Admin</a><% } %>
+    <a href="/featured" style="color:gold;">Featured</a>
+    <a href="/information">Information</a>
+    
+    <% if (typeof userRole !== 'undefined' && (userRole === 'admin' || userRole === 'mod')) { %>
+        <a href="/admin">Admin</a>
+    <% } %>
+    
     <a href="/settings">Settings</a>
 </nav>

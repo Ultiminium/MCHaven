@@ -3,15 +3,19 @@
     
     <h3 class="user-result-username">
         <%= user.username %>
-        <% if (user.role === 'mod') { %> ⚔️ <% } %>
-        <% if (user.role === 'admin') { %> 🛡️ <% } %>
+        <% if (user.role === 'mod') { %> <span title="Mod">⚔️</span> <% } %>
+        <% if (user.role === 'admin') { %> <span title="Admin">🛡️</span> <% } %>
     </h3>
     
     <% if (user.role !== 'user') { %>
-        <div class="user-result-role"><%= user.role %></div>
+        <div class="user-result-role" style="color: var(--accent-primary); font-weight: bold; text-transform: uppercase; font-size: 0.8rem; margin-top: 5px;">
+            <%= user.role %>
+        </div>
     <% } %>
 
     <% if (user.bio) { %>
-        <div class="user-result-bio"><%= user.bio %></div>
+        <div class="user-result-bio" style="font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <%= user.bio %>
+        </div>
     <% } %>
 </a>

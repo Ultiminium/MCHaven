@@ -1,13 +1,29 @@
 <a href="/submission/<%= submission.id %>" class="item-card">
-    <img src="<%= submission.thumbnail_url %>" alt="Thumbnail for <%= submission.title %>">
+    <img src="<%= submission.thumbnail_url %>" alt="<%= submission.title %>" loading="lazy">
     <div class="info">
-        <h3><%= submission.title %></h3>
         <div class="card-meta-info">
-            <span class="category-tag"><%= submission.category.replace('-', ' ') %></span>
+            <% if (submission.edition === 'java') { %>
+                <span class="category-tag" style="background-color: #d32f2f;">Java</span>
+            <% } else { %>
+                <span class="category-tag" style="background-color: #388e3c;">Bedrock</span>
+            <% } %>
+            
+            <span class="category-tag" style="background-color: #555;"><%= submission.category.replace('-', ' ') %></span>
+            
             <% if (submission.supported_versions) { %>
                 <span class="version-tag"><%= submission.supported_versions %></span>
             <% } %>
         </div>
-        <div class="description"><%= submission.description %></div>
+
+        <h3><%= submission.title %></h3>
+        <p class="description"><%= submission.description.substring(0, 80) %>...</p>
+
+        <% if (submission.tags) { %>
+            <div class="card-tags" style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                <% submission.tags.split(',').slice(0, 3).forEach(tag => { %>
+                    <span style="background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 3px; margin-right: 3px;">#<%= tag.trim() %></span>
+                <% }); %>
+            </div>
+        <% } %>
     </div>
 </a>
