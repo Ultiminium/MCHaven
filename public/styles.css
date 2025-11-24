@@ -1,16 +1,6 @@
-html {
-    scroll-behavior: smooth;
-}
-
-/* 1. FONT & BODY DEFAULTS */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    margin: 0;
-    line-height: 1.6;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-/* 2. THEME DEFINITIONS */
+/* =========================================
+   1. GLOBAL & THEME VARIABLES
+========================================= */
 :root {
     --bg-primary: #1a1122; 
     --bg-secondary: #2c1d3c; 
@@ -21,194 +11,39 @@ body {
     --border-color: #9d4edd;
 }
 
-[data-theme="green"] {
-    --bg-primary: #121212; 
-    --bg-secondary: #1e1e1e; 
-    --text-primary: #e0e0e0; 
-    --text-secondary: #888;
-    --accent-primary: #4CAF50; 
-    --accent-secondary: #5dc662; 
-    --border-color: #4CAF50;
+/* Accessibility Themes */
+[data-theme="green"] { --bg-primary: #121212; --bg-secondary: #1e1e1e; --text-primary: #e0e0e0; --text-secondary: #888; --accent-primary: #4CAF50; --border-color: #4CAF50; }
+[data-theme="deuteranopia"] { --bg-primary: #1f1f2e; --bg-secondary: #2e2e44; --text-primary: #f0f0ff; --text-secondary: #b0b0d0; --accent-primary: #007bff; --border-color: #007bff; }
+[data-theme="protanopia"] { --bg-primary: #1d1d1d; --bg-secondary: #2f2f2f; --text-primary: #ffffff; --text-secondary: #cccccc; --accent-primary: #17a2b8; --border-color: #17a2b8; }
+
+html { scroll-behavior: smooth; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    line-height: 1.6;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background 0.3s;
+    overflow-x: hidden; /* Stops side-scrolling glitch */
 }
 
-[data-theme="deuteranopia"] {
-    --bg-primary: #1f1f2e; 
-    --bg-secondary: #2e2e44; 
-    --text-primary: #f0f0ff; 
-    --text-secondary: #b0b0d0;
-    --accent-primary: #007bff; 
-    --accent-secondary: #ffc107; 
-    --border-color: #007bff;
-}
+/* =========================================
+   2. DESKTOP LAYOUT (Default)
+========================================= */
 
-[data-theme="protanopia"] {
-    --bg-primary: #1d1d1d; 
-    --bg-secondary: #2f2f2f; 
-    --text-primary: #ffffff; 
-    --text-secondary: #cccccc;
-    --accent-primary: #17a2b8; 
-    --accent-secondary: #fd7e14; 
-    --border-color: #17a2b8;
-}
-
-/* 3. APPLYING THE THEME */
-body { 
-    background-color: var(--bg-primary); 
-    color: var(--text-primary); 
-}
-
+/* Header - The "Floating" Desktop Look */
 header {
     background-color: var(--bg-secondary);
     text-align: center;
     padding: 2rem 1rem;
     border-bottom: 3px solid var(--border-color);
-    position: relative;
-    margin-bottom: 1rem;
+    position: relative; /* Allows absolute positioning inside */
+    margin-bottom: 0;
 }
 
-nav { 
-    display: flex; 
-    justify-content: center; 
-    background-color: #333; 
-    padding: 0.5rem 0; 
-    flex-wrap: wrap; 
-}
+header h1 { font-size: 2.5rem; margin: 0; }
 
-nav a {
-    color: white;
-    padding: 14px 20px;
-    text-decoration: none;
-    text-transform: uppercase;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-nav a:hover, nav a.active { 
-    background-color: var(--accent-primary); 
-}
-
-main { 
-    max-width: 1200px; 
-    margin: 2rem auto; 
-    padding: 0 1rem; 
-}
-
-.content-box {
-    background-color: var(--bg-secondary);
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-footer { 
-    text-align: center; 
-    padding: 1.5rem; 
-    margin-top: 2rem; 
-    color: var(--text-secondary); 
-    background-color: var(--bg-secondary); 
-}
-
-/* 4. LAYOUT STYLES */
-.item-container { 
-    display: grid; 
-    gap: 1.5rem; 
-}
-
-.item-card {
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform 0.2s;
-    text-decoration: none;
-    color: var(--text-primary);
-}
-
-.item-card:hover { 
-    transform: translateY(-5px); 
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3); 
-}
-
-.item-card img { 
-    width: 100%; 
-    height: 200px; 
-    object-fit: cover; 
-    display: block; 
-    background-color: #333; 
-}
-
-.item-card .info { 
-    padding: 1rem; 
-}
-
-.item-card h3 { 
-    margin: 0; 
-    padding: 0; 
-}
-
-.item-card .description { 
-    padding-top: 0.5rem; 
-    font-size: 0.9rem; 
-    color: var(--text-secondary); 
-}
-
-.card-meta-info { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 0.5rem; 
-    margin: 0.5rem 0; 
-}
-
-.category-tag, .version-tag {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 15px;
-    font-weight: bold;
-    text-transform: capitalize;
-}
-
-.category-tag { 
-    background-color: var(--accent-primary); 
-    color: white; 
-}
-
-.version-tag { 
-    background-color: var(--bg-primary); 
-    border: 1px solid var(--text-secondary); 
-    color: var(--text-secondary); 
-}
-
-[data-layout="grid"] .item-container { 
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-}
-
-[data-layout="grid"] .item-card .description { 
-    display: none; 
-}
-
-[data-layout="list"] .item-container { 
-    grid-template-columns: 1fr; 
-}
-
-[data-layout="list"] .item-card { 
-    display: flex; 
-    align-items: flex-start; 
-}
-
-[data-layout="list"] .item-card img { 
-    width: 200px; 
-    height: 120px; 
-    flex-shrink: 0; 
-}
-
-[data-layout="list"] .item-card .info { 
-    flex: 1; 
-}
-
-[data-layout="list"] .item-card .description { 
-    display: block; 
-}
-
-/* 5. HEADER BUTTONS & SEARCH */
+/* This puts buttons in the top-right corner on PC */
 .header-right { 
     position: absolute; 
     top: 20px; 
@@ -218,28 +53,44 @@ footer {
     gap: 1rem; 
 }
 
-.search-form { 
+/* Navigation Bar */
+nav { 
     display: flex; 
+    justify-content: center; 
+    background-color: #333; 
+    padding: 0; 
+    flex-wrap: wrap;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-.search-form input {
-    border: 2px solid var(--border-color);
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    padding: 10px;
-    border-radius: 5px 0 0 5px;
-    border-right: none;
-}
-
-.search-form button {
-    border: 2px solid var(--accent-primary);
-    background-color: var(--accent-primary);
+nav a {
     color: white;
-    cursor: pointer;
-    padding: 10px 15px;
-    border-radius: 0 5px 5px 0;
+    padding: 15px 20px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+}
+nav a:hover, nav a.active { background-color: var(--accent-primary); }
+
+/* Main Container */
+main { 
+    max-width: 1200px; 
+    margin: 2rem auto; 
+    padding: 0 1rem; 
+    min-height: 60vh;
 }
 
+.content-box {
+    background-color: var(--bg-secondary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 2rem;
+}
+
+/* Buttons & Inputs */
 .button, .donate-btn-header {
     background-color: var(--accent-primary);
     color: white !important;
@@ -248,472 +99,139 @@ footer {
     text-decoration: none;
     font-weight: bold;
     text-transform: uppercase;
-    transition: background-color 0.2s;
-}
-
-.button:hover, .donate-btn-header:hover { 
-    background-color: var(--accent-secondary); 
-}
-
-/* Donate Button Special Style */
-.donate-btn-header {
-    background-color: #ff9800; 
-    border: 2px solid #ff9800;
-    cursor: pointer;
-}
-
-.donate-btn-header:hover { 
-    background-color: #ffb74d; 
-    border-color: #ffb74d; 
-}
-
-.submit-button-special {
-    background-color: #c77dff;
-    color: white !important;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    text-transform: uppercase;
-    transition: background-color 0.2s;
-}
-
-.submit-button-special:hover { 
-    background-color: #e040fb; 
-}
-
-/* 6. FORM STYLES & MESSAGES */
-.form-group { 
-    margin-bottom: 1.5rem; 
-    display: flex; 
-    flex-direction: column; 
-}
-
-.form-group label { 
-    margin-bottom: 0.5rem; 
-    font-weight: bold; 
-}
-
-.form-group input, .form-group textarea, .form-group select {
-    background-color: var(--bg-primary);
-    border: 1px solid #555;
-    color: var(--text-primary);
-    padding: 0.75rem;
-    border-radius: 5px;
-    font-size: 1rem;
-    width: 100%;
-    box-sizing: border-box;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-    outline: none;
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.3);
-}
-
-.form-group input::placeholder, .form-group textarea::placeholder { 
-    color: #888; 
-    opacity: 1; 
-}
-
-.message { 
-    padding: 1rem; 
-    margin-bottom: 1.5rem; 
-    border-radius: 5px; 
-}
-
-.message.success { 
-    background-color: #28a745; 
-    color: white; 
-}
-
-.message.error { 
-    background-color: #dc3545; 
-    color: white; 
-}
-
-.settings-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    gap: 1.5rem; 
-}
-
-/* 7. PROFILE PAGE STYLES */
-.profile-layout { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 2rem; 
-}
-
-.profile-submissions { 
-    flex: 3; 
-    min-width: 300px; 
-}
-
-.profile-info { 
-    flex: 1; 
-    min-width: 250px; 
-}
-
-.profile-user-line { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    gap: 0.5rem; 
-}
-
-.top-creator-tag {
-    background-color: var(--bg-secondary);
-    color: var(--accent-primary);
-    padding: 0.25rem 0.75rem;
-    border-radius: 5px;
-    border: 1px solid var(--accent-primary);
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    margin-bottom: 1rem;
-    display: inline-block;
-    box-shadow: 0 0 10px var(--accent-primary);
-    text-shadow: 0 0 5px var(--accent-primary);
-}
-
-.follower-section { 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    gap: 1rem; 
-    margin-top: 1rem; 
-}
-
-.follower-section p, .follower-section form { 
-    margin: 0; 
-}
-
-.profile-bio { 
-    margin-top: 1.5rem; 
-    padding-top: 1.5rem; 
-    border-top: 1px solid #444; 
-    text-align: left; 
-    color: var(--text-secondary); 
-}
-
-/* 8. COMMENT STYLES */
-.comments-container { 
-    margin-top: 2rem; 
-}
-
-.comment { 
-    display: flex; 
-    gap: 1rem; 
-    padding: 1rem 0; 
-    border-top: 1px solid #444; 
-    position: relative; 
-}
-
-.comment-menu { 
-    position: absolute; 
-    left: 0; 
-    top: 1rem; 
-}
-
-.comment-content { 
-    padding-left: 2.5rem; 
-    width: 100%; 
-}
-
-.comment-menu summary { 
-    cursor: pointer; 
-    list-style: none; 
-    font-size: 1.5rem; 
-    line-height: 1; 
-    padding: 0 0.5rem; 
-}
-
-.comment-menu summary::-webkit-details-marker { 
-    display: none; 
-}
-
-.menu-dropdown {
-    position: absolute;
-    left: 0;
-    top: 100%;
-    background-color: var(--bg-primary);
-    border: 1px solid #555;
-    border-radius: 5px;
-    padding: 0.5rem;
-    z-index: 10;
-    width: 150px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.menu-dropdown a, .menu-dropdown button {
-    display: block;
-    width: 100%;
-    padding: 0.5rem;
-    background: none;
+    transition: background 0.2s;
     border: none;
-    color: var(--text-primary);
-    text-align: left;
     cursor: pointer;
-    text-decoration: none;
+    display: inline-block;
+}
+.button:hover { background-color: var(--accent-secondary); }
+.donate-btn-header { background-color: #ff9800; border: 2px solid #ff9800; }
+.donate-btn-header:hover { background-color: #ffb74d; border-color: #ffb74d; }
+.submit-button-special { background-color: #c77dff; color:white!important; padding:10px 20px; border-radius:5px; text-decoration:none; font-weight:bold; text-transform:uppercase; }
+
+.search-form { display: flex; }
+.search-form input {
+    border: 2px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);
+    padding: 10px; border-radius: 5px 0 0 5px; border-right: none;
+}
+.search-form button {
+    border: 2px solid var(--accent-primary); background: var(--accent-primary); color: white;
+    cursor: pointer; padding: 10px 15px; border-radius: 0 5px 5px 0;
 }
 
-.menu-dropdown a:hover, .menu-dropdown button:hover { 
-    background-color: var(--accent-primary); 
+/* Form Elements */
+.form-group { margin-bottom: 1.5rem; display: flex; flex-direction: column; }
+.form-group label { margin-bottom: 0.5rem; font-weight: bold; }
+.form-group input, .form-group textarea, .form-group select {
+    background: var(--bg-primary); border: 1px solid #555; color: var(--text-primary);
+    padding: 0.75rem; border-radius: 5px; font-size: 1rem; width: 100%; box-sizing: border-box;
 }
 
-.menu-dropdown .delete-option { 
-    color: #ff8a80; 
-}
+/* Grid System */
+.item-container { display: grid; gap: 1.5rem; }
+[data-layout="grid"] .item-container { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+[data-layout="list"] .item-container { grid-template-columns: 1fr; }
 
-.menu-dropdown .delete-option:hover { 
-    background-color: #dc3545; 
-    color: white; 
+.item-card {
+    background: var(--bg-secondary); border-radius: 8px; overflow: hidden; transition: transform 0.2s;
+    text-decoration: none; color: var(--text-primary); border: 1px solid var(--border-color); display: block;
 }
+.item-card:hover { transform: translateY(-5px); }
+.item-card img { width: 100%; height: 200px; object-fit: cover; display: block; background: #333; }
+.item-card .info { padding: 1rem; }
 
-.comment-pfp { 
-    width: 40px; 
-    height: 40px; 
-    border-radius: 50%; 
-    object-fit: cover; 
-}
+/* Profile */
+.profile-layout { display: flex; flex-wrap: wrap; gap: 2rem; }
+.profile-submissions { flex: 3; min-width: 300px; }
+.profile-info { flex: 1; min-width: 250px; }
 
-.comment-author { 
-    display: flex; 
-    align-items: center; 
-    gap: 0.5rem; 
-    margin-bottom: 0.5rem; 
-}
+/* User Search Cards */
+.user-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+.user-result-card { background: var(--bg-secondary); padding: 20px; text-align: center; border-radius: 8px; border: 1px solid var(--border-color); text-decoration: none; color: inherit; display: block; }
+.user-result-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--accent-primary); }
 
-.comment-text { 
-    margin: 0; 
-    word-wrap: break-word; 
-}
+/* Footer & Modals */
+footer { text-align: center; padding: 2rem; margin-top: 2rem; color: var(--text-secondary); background: var(--bg-secondary); }
+.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); overflow: auto; }
+.modal-content { background: var(--bg-secondary); margin: 10% auto; padding: 20px; border: 2px solid var(--accent-primary); width: 90%; max-width: 500px; border-radius: 10px; position: relative; text-align: center; }
+.close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+.donation-options { display: grid; gap: 1rem; margin-top: 1rem; }
+.donation-option-card { background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 8px; }
+.crypto-address-box { background: var(--bg-primary); padding: 10px; border-radius: 5px; word-break: break-all; font-family: monospace; }
 
-.reported-comment { 
-    margin-bottom: 1rem; 
-}
-
-.reported-user-card {
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
-    padding: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.reported-user-card a { 
-    color: var(--text-primary); 
-    text-decoration: none; 
-    flex-grow: 1; 
-}
-
-.reported-user-card a:hover { 
-    text-decoration: underline; 
-}
-
-/* 9. PAGINATION STYLES */
-.pagination-nav { 
-    display: flex; 
-    justify-content: center; 
-    margin-top: 2rem; 
-}
-
-.pagination-nav ul { 
-    list-style: none; 
-    padding: 0; 
-    display: flex; 
-    gap: 0.5rem; 
-}
-
-.pagination-nav a, .pagination-nav span {
-    display: block;
-    padding: 0.5rem 1rem;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: background-color 0.2s;
-}
-
-.pagination-nav a:hover { 
-    background-color: var(--accent-primary); 
-    border-color: var(--accent-primary); 
-}
-
-.pagination-nav .active span { 
-    background-color: var(--accent-primary); 
-    border-color: var(--accent-primary); 
-    color: white; 
-}
-
-.pagination-nav .disabled span { 
-    background-color: #333; 
-    border-color: #555; 
-    color: #777; 
-    cursor: not-allowed; 
-}
-
-/* 10. DETAIL PAGE EXTRAS */
-.supported-versions-box { 
-    background-color: var(--bg-primary); 
-    border: 1px solid var(--border-color); 
-    padding: 1rem; 
-    border-radius: 5px; 
-    margin: 1.5rem 0; 
-}
-
-.supported-versions-box span { 
-    margin-left: 0.5rem; 
-    color: var(--text-secondary); 
-}
-
-.image-gallery { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-    gap: 1rem; 
-    margin: 1.5rem 0; 
-}
-
-.image-gallery img { 
-    width: 100%; 
-    height: auto; 
-    border-radius: 8px; 
-    border: 2px solid var(--bg-secondary); 
-}
-
-/* 11. DONATION MODAL */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 2000; 
-    left: 0; 
-    top: 0; 
-    width: 100%; 
-    height: 100%;
-    overflow: auto; 
-    background-color: rgba(0,0,0,0.8);
-    backdrop-filter: blur(5px);
-}
-
-.modal-content {
-    background-color: var(--bg-secondary); 
-    margin: 10% auto; 
-    padding: 20px;
-    border: 2px solid var(--accent-primary); 
-    width: 90%; 
-    max-width: 500px;
-    border-radius: 10px; 
-    position: relative; 
-    text-align: center;
-    box-shadow: 0 0 20px rgba(157, 78, 221, 0.4);
-}
-
-.close-modal {
-    color: #aaa; 
-    float: right; 
-    font-size: 28px; 
-    font-weight: bold; 
-    cursor: pointer;
-}
-
-.close-modal:hover, .close-modal:focus { 
-    color: white; 
-    text-decoration: none; 
-}
-
-.crypto-address-box {
-    background-color: var(--bg-primary); 
-    padding: 10px; 
-    border-radius: 5px;
-    border: 1px dashed #555; 
-    margin: 10px 0; 
-    word-break: break-all; 
-    font-family: monospace; 
-    user-select: all;
-}
-
-.donation-options { 
-    display: grid; 
-    gap: 1rem; 
-    margin-top: 1rem; 
-}
-
-.donation-option-card {
-    background: rgba(255,255,255,0.05); 
-    padding: 1rem; 
-    border-radius: 8px;
-}
-
-/* 12. NEW: USER CARD STYLES (For Search) */
-.user-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
-
-.user-result-card {
-    background-color: var(--bg-secondary);
-    border-radius: 8px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: transform 0.2s;
-    border: 1px solid var(--border-color);
-    text-decoration: none;
-    color: var(--text-primary);
-    display: block;
-}
-
-.user-result-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(157, 78, 221, 0.3);
-}
-
-.user-result-img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    border: 2px solid var(--accent-primary);
-}
-
-.user-result-username {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 0;
-}
-
-.user-result-role {
-    font-size: 0.85rem;
-    color: var(--accent-primary);
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-top: 0.2rem;
-}
-
-.user-result-bio {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    margin-top: 0.5rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
+/* =========================================
+   3. MOBILE OVERRIDES (The "Phone Layout")
+========================================= */
 @media (max-width: 768px) {
-    .header-right { 
-        position: static; 
-        flex-direction: column; 
-        width: 100%; 
-        margin-top: 1rem; 
+    
+    /* RESET HEADER: Stack everything vertically */
+    header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        height: auto;
     }
-    .search-form { 
-        width: 80%; 
-        justify-content: center; 
+
+    /* RESET BUTTONS: Stop floating them in the corner */
+    .header-right {
+        position: static; /* This is the magic fix */
+        margin-top: 1rem;
+        width: 100%;
+        display: flex;
+        flex-direction: column; /* Stack buttons top-to-bottom */
+        gap: 10px;
+        align-items: center;
+        padding: 0 20px;
+        box-sizing: border-box;
+    }
+
+    /* SEARCH BAR: Make it wide and easy to tap */
+    .search-form {
+        width: 100%;
+        max-width: 100%;
+        justify-content: center;
+    }
+    .search-form input {
+        flex: 1; /* Grow to fill space */
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    .search-form button {
+        padding: 10px 20px;
+    }
+
+    /* NAVIGATION: Scroll sideways instead of wrapping */
+    nav {
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        position: sticky;
+        top: 0;
+        z-index: 100; /* Keep nav on top when scrolling */
+        border-top: 1px solid #444;
+    }
+    nav a {
+        padding: 15px;
+        font-size: 0.85rem;
+        flex: 0 0 auto;
+    }
+
+    /* LAYOUT: Single column for everything */
+    [data-layout="grid"] .item-container {
+        grid-template-columns: 1fr; /* One item per row */
+    }
+    .user-card-grid {
+        grid-template-columns: 1fr;
+    }
+    .profile-layout {
+        flex-direction: column-reverse; /* Info on top, posts below */
+    }
+    
+    /* DIALOGS: Make them fit screen */
+    .modal-content, dialog {
+        width: 90%;
+        margin: 20% auto;
     }
 }

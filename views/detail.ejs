@@ -24,8 +24,8 @@
 
         <div class="content-box">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem;">
-                <div>
-                    <h1 style="margin: 0 0 0.5rem 0;"><%= submission.title %></h1>
+                <div style="max-width: 80%;">
+                    <h1 style="margin: 0 0 0.5rem 0; word-wrap: break-word;"><%= submission.title %></h1>
                     <div class="card-meta-info">
                         <span class="category-tag"><%= submission.category %></span>
                         <span class="category-tag" style="background: <%= submission.edition === 'java' ? '#d32f2f' : '#388e3c' %>;"><%= submission.edition %></span>
@@ -49,18 +49,33 @@
                 <% } %>
             </div>
 
-            <div style="white-space: pre-wrap; line-height: 1.6; margin-bottom: 2rem;"><%= submission.description %></div>
+            <% if (submission.description.length > 800) { %>
+                <a href="#downloads" style="display: inline-block; margin-bottom: 1rem; font-weight: bold; color: var(--accent-primary); text-decoration: none; border: 1px solid var(--accent-primary); padding: 5px 10px; border-radius: 5px;">
+                    ⬇ Skip to Download
+                </a>
+            <% } %>
 
-            <div class="actions-section" style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+            <div style="white-space: pre-wrap; line-height: 1.6; margin-bottom: 2rem; overflow-wrap: break-word; word-break: break-word; max-width: 100%;">
+                <%= submission.description %>
+            </div>
+
+            <% if (submission.tags) { %>
+                <div style="margin-bottom: 2rem; color: var(--text-secondary);">
+                    <strong>Tags:</strong> 
+                    <% submission.tags.split(',').forEach(tag => { %>
+                        <span style="background: var(--bg-primary); padding: 2px 8px; border-radius: 4px; margin-right: 5px; font-size: 0.9rem;">#<%= tag.trim() %></span>
+                    <% }); %>
+                </div>
+            <% } %>
+
+            <div id="downloads" class="actions-section" style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
                 
                 <% if (submission.status === 'approved' || locals.userId === submission.user_id || userRole === 'admin') { %>
-                    
                     <% if (submission.download_url.startsWith('/')) { %>
                         <a href="<%= submission.download_url %>" class="button" download>Download File</a>
                     <% } else { %>
                         <a href="/download-redirect?url=<%= encodeURIComponent(submission.download_url) %>" class="button" target="_blank">Download External</a>
                     <% } %>
-
                 <% } else { %>
                     <button class="button" disabled style="background: #555; cursor: not-allowed;">Download Locked</button>
                 <% } %>
@@ -87,9 +102,9 @@
             <% comments.forEach(c => { %>
                 <div class="comment" style="border-top:1px solid var(--border-color); padding:10px 0; display:flex; gap:10px;">
                     <img src="<%= c.pfp_url %>" style="width:40px; height:40px; border-radius:50%;">
-                    <div>
+                    <div style="flex: 1; min-width: 0;">
                         <strong><a href="/profile/<%= c.username %>"><%= c.username %></a></strong>
-                        <p style="margin:5px 0;"><%= c.comment_text %></p>
+                        <p style="margin:5px 0; overflow-wrap: break-word; word-break: break-word;"><%= c.comment_text %></p>
                         <div style="font-size:0.8rem;">
                             <% if (locals.userId) { %>
                                 <form action="/comment/<%= c.id %>/report" method="POST" style="display:inline;"><button style="background:none; border:none; color:#777; cursor:pointer;">Report</button></form>
