@@ -1,0 +1,5 @@
+database.db
+public/pfps/*
+public/thumbnails/*
+public/downloads/*
+node_modules
