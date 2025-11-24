@@ -3,3 +3,4 @@ public/pfps/*
 public/thumbnails/*
 public/downloads/*
 node_modules
+database.db
