@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/head'); %>
+<body>
+    <%- include('partials/header'); %>
+    <main>
+        <div class="content-box" style="text-align:center; border: 2px solid gold;">
+            <h2>🌟 Featured Content</h2>
+            <p>Hand-picked favorites from the staff team.</p>
+        </div>
+        <div class="item-container">
+            <% submissions.forEach(submission => { %>
+                <%- include('partials/item-card', { submission: submission }) %>
+            <% }); %>
+        </div>
+    </main>
+    <%- include('partials/footer'); %>
+    <script src="/auth.js"></script>
+    <script src="/script.js"></script>
+</body>
+</html>

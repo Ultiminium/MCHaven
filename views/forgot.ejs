@@ -7,24 +7,31 @@
         <div class="content-box" style="max-width: 400px; margin: 0 auto; text-align: center;">
             <h2>Forgot Password</h2>
             <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                Enter your email address below. We will send you a 6-digit code to reset your password.
+                For security, please verify your account details.
             </p>
             
             <% if (message) { %>
-                <div class="message" style="background-color: #333; border: 1px solid var(--accent-primary); padding: 10px; border-radius: 5px;">
+                <div class="message" style="background-color: #333; border: 1px solid var(--accent-primary); padding: 10px; border-radius: 5px; margin-bottom: 1rem;">
                     <%= message %>
                 </div>
             <% } %>
 
-            <form action="/forgot-password" method="POST" style="margin-top: 1.5rem;">
+            <form action="/forgot-password" method="POST" style="text-align: left;">
+                
                 <div class="form-group">
-                    <label style="text-align: left; display: block;">Email Address</label>
-                    <input type="email" name="email" placeholder="Enter your email..." required>
+                    <label>Username</label>
+                    <input type="text" name="username" placeholder="Your username" required>
                 </div>
-                <button type="submit" class="button" style="width: 100%;">Send Reset Code</button>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="address@example.com" required>
+                </div>
+
+                <button type="submit" class="button" style="width: 100%; margin-top: 10px;">Send Reset Code</button>
             </form>
             
-            <p style="margin-top: 1.5rem;">
+            <p style="margin-top: 1.5rem; text-align: center;">
                 <a href="/login.html" style="color: var(--text-secondary);">Back to Login</a>
             </p>
         </div>
