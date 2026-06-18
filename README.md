@@ -9,7 +9,8 @@ If you want to try this out, in your command line:
 
 ***Linux (Arch)***
 ```sudo pacman -S node``` OR ```sudo pacman -S node npm```
-I recommend install npm
+
+I recommend installing npm if you ever intend doing anything else with node
 
 
 Then simply:
