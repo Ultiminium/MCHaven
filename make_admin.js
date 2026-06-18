@@ -1,7 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./database.db');
 
-// CHANGE 'Spencer' TO YOUR EXACT USERNAME
 const usernameToPromote = 'moaca'; 
 
 console.log(`Attempting to promote user: ${usernameToPromote}...`);
