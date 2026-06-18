@@ -14,8 +14,7 @@ I recommend install npm
 
 Then simply:
 
-```git clone https://github.com/Ultiminium/MCHaven`
-cd ~/MCHaven``` 
+```git clone https://github.com/Ultiminium/MCHaven cd ~/MCHaven``` 
 
 or whatever directory you're in/installed it to
 
