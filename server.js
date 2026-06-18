@@ -36,7 +36,7 @@ app.set('view engine', 'ejs');
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: { 
-        user: 'spencer@northwinns.com', 
+        user: 'mchas4000@gmail.com', 
         pass: 'nqbrjapzkkecfpyv' 
     }
 });
